@@ -11,14 +11,18 @@ public class Reservation {
 
     public Reservation(int dlicense, String vtname, Date fromDate, Date toDate){
         setConfNo();
-        dlicense = this.dlicense;
-        vtname = this.vtname;
-        fromDate = this.fromDate;
-        toDate = this.toDate;
+        this.dlicense = dlicense;
+        this.vtname = vtname;
+        this.fromDate = fromDate;
+        this.toDate = toDate;
     }
 
     public void setConfNo(){
         confNo = (int)(Math.random()*1000);
+    }
+
+    public void setExistingConf(int confNo){
+        this.confNo = confNo;
     }
 
     public int getConfNo(){

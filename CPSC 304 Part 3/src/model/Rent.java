@@ -22,6 +22,10 @@ public class Rent {
         rid = (int)(Math.random()*1000);
     }
 
+    public void setExistingRid(int rid){
+        this.rid = rid;
+    }
+
     public int getRid(){
         return rid;
     }
