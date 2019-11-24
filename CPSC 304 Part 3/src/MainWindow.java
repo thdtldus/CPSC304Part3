@@ -13,6 +13,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Customer;
 import model.Vehicle;
+import model.VehicleType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -120,13 +121,20 @@ public class MainWindow extends Application {
         grid.add(dlicense, 0, 3);
         TextField licenseField = new TextField();
         grid.add(licenseField, 1, 3);
-        Text carType = new Text("Type of car wanted: (choices: SUV, )");
+        Text carType = new Text("Type of car wanted:");
         grid.add(carType, 0, 4);
         TextField carTypeWantedField = new TextField();
         grid.add(carTypeWantedField, 1, 4);
-        //need fromDate and toDate as well
+        Text fromDate = new Text("Starting from:");
+        grid.add(fromDate, 0, 5);
+        TextField fromField = new TextField();
+        grid.add(fromField, 1, 5);
+        Text toDate = new Text("Ending on:");
+        grid.add(toDate, 2, 5);
+        TextField toField = new TextField();
+        grid.add(toField, 3, 5);
         Button reserveButton = new Button("Make a reservation");
-        grid.add(reserveButton, 0, 5);
+        grid.add(reserveButton, 0, 6);
         reserveButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -143,11 +151,11 @@ public class MainWindow extends Application {
             }
         });
         Text reserveNo = new Text("Reservation number: (if none, leave it blank)");
-        grid.add(reserveNo, 0, 6);
+        grid.add(reserveNo, 0, 7);
         TextField reserveField = new TextField();
-        grid.add(reserveField, 1, 6);
+        grid.add(reserveField, 1, 7);
         Button rentCar = new Button ("Rent car out");
-        grid.add(rentCar, 0, 7);
+        grid.add(rentCar, 0, 8);
         rentCar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -156,11 +164,11 @@ public class MainWindow extends Application {
             }
         });
         Text rid = new Text("Rent ID Number");
-        grid.add(rid, 0, 8);
+        grid.add(rid, 0, 9);
         TextField ridField = new TextField();
-        grid.add(ridField, 1, 8);
+        grid.add(ridField, 1, 9);
         Button returnsCar = new Button("Return a rented car");
-        grid.add(returnsCar, 0, 9);
+        grid.add(returnsCar, 0, 10);
         returnsCar.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -168,9 +176,9 @@ public class MainWindow extends Application {
             }
         });
         Text generateReports = new Text("Generate reports for:");
-        grid.add(generateReports, 0, 10);
+        grid.add(generateReports, 0, 11);
         Button dailyRentals = new Button("Daily Rentals");
-        grid.add(dailyRentals, 0, 11);
+        grid.add(dailyRentals, 0, 12);
         dailyRentals.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -178,7 +186,7 @@ public class MainWindow extends Application {
             }
         });
         Button dailyRentalsBranch = new Button("Daily Rentals for Branch");
-        grid.add(dailyRentalsBranch, 1, 11);
+        grid.add(dailyRentalsBranch, 1, 12);
         dailyRentalsBranch.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -186,7 +194,7 @@ public class MainWindow extends Application {
             }
         });
         Button dailyReturns = new Button("Daily Returns");
-        grid.add(dailyReturns, 2, 11);
+        grid.add(dailyReturns, 2, 12);
         dailyReturns.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -194,7 +202,7 @@ public class MainWindow extends Application {
             }
         });
         Button dailyReturnsBranch = new Button("Daily Returns for Branch");
-        grid.add(dailyReturnsBranch, 3, 11);
+        grid.add(dailyReturnsBranch, 3, 12);
         dailyReturnsBranch.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -202,17 +210,17 @@ public class MainWindow extends Application {
             }
         });
         Button displayRows = new Button("Display all rows");
-        grid.add(displayRows, 0, 14);
+        grid.add(displayRows, 0, 15);
         displayRows.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                //this will create new window that inside it you can modify the tables
+                createDisplayWindow();
             }
         });
         Button modifyTables = new Button("Insert or delete a tuple (type query in right)");
-        grid.add(modifyTables, 0, 15);
+        grid.add(modifyTables, 0, 16);
         TextField query = new TextField();
-        grid.add(query, 1, 15);
+        grid.add(query, 1, 16);
         modifyTables.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -315,13 +323,62 @@ public class MainWindow extends Application {
                 customerStage.hide();
             }
         });
-        Scene scene = new Scene(grid, 500, 500);
+        Scene scene = new Scene(grid, 250, 500);
         customerStage.setScene(scene);
         customerStage.show();
     }
 
     private void createReservationWindow(int confNum, String carType){
+        Stage reserveStage = new Stage();
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(20.0);
+        grid.setVgap(10.0);
 
+
+    }
+
+    private void createDisplayWindow(){
+        Stage displayStage = new Stage();
+        GridPane grid = new GridPane();
+        grid.setHgap(20.0);
+        grid.setVgap(10.0);
+        int acc = 0;
+        //display vehicletypes
+        Text vehicleTypes = new Text("VehicleTypes:");
+        grid.add(vehicleTypes, 0, acc);
+        acc++;
+        for(VehicleType vt : dbhandler.getAllVehicleTypes(con)){
+            Text vtname = new Text(vt.getVtname());
+            grid.add(vtname, 0, acc);
+            Text features = new Text(vt.getFeatures());
+            grid.add(features, 1, acc);
+            Text wrate = new Text(Integer.toString(vt.getWrate()));
+            grid.add(wrate, 2, acc);
+            Text drate = new Text(Integer.toString(vt.getDrate()));
+            grid.add(drate, 3, acc);
+            Text hrate = new Text(Integer.toString(vt.getHrate()));
+            grid.add(hrate, 4, acc);
+            Text wirate = new Text(Integer.toString(vt.getWirate()));
+            grid.add(wirate, 5, acc);
+            Text dirate = new Text(Integer.toString(vt.getDirate()));
+            grid.add(dirate, 6, acc);
+            Text hirate = new Text(Integer.toString(vt.getHirate()));
+            grid.add(hirate, 7, acc);
+            Text krate = new Text(Integer.toString(vt.getKrate()));
+            grid.add(krate, 8, acc);
+            acc++;
+        }
+        //display vehicles
+        Text vehicles = new Text("Vehicles:");
+        grid.add(vehicles, 0, acc);
+        acc++;
+        for(Vehicle v : dbhandler.getAllVehicles(con)){
+
+        }
+        Scene scene = new Scene(grid, 1000, 1000);
+        displayStage.setScene(scene);
+        displayStage.show();
     }
 
     private void createErrorWindow(String error){

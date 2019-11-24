@@ -2,6 +2,7 @@ import exception.NoCarAvailableException;
 import exception.NoSuchCustomerException;
 import model.Customer;
 import model.Vehicle;
+import model.VehicleType;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -84,6 +85,54 @@ public class DatabaseHandler {
 
     }
 
+
+    public ArrayList<VehicleType> getAllVehicleTypes(Connection con){
+        ArrayList<VehicleType> vehicleTypeList = new ArrayList<>();
+        try {
+            Statement statement = con.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT * FROM VehicleType");
+            while(rs.next()){
+                VehicleType vehicleType = new VehicleType(rs.getString("vtname"));
+                vehicleType.setFeatures(rs.getString("features"));
+                vehicleType.setWrate(rs.getInt("wrate"));
+                vehicleType.setDrate(rs.getInt("drate"));
+                vehicleType.setHrate(rs.getInt("hrate"));
+                vehicleType.setWirate(rs.getInt("wirate"));
+                vehicleType.setDirate(rs.getInt("dirate"));
+                vehicleType.setHirate(rs.getInt("hirate"));
+                vehicleType.setKrate(rs.getInt("krate"));
+                vehicleTypeList.add(vehicleType);
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return vehicleTypeList;
+    }
+
+    public ArrayList<Vehicle> getAllVehicles(Connection con){
+        ArrayList<Vehicle> vehicleList = new ArrayList<>();
+        try {
+            Statement statement = con.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT * FROM Vehicle");
+            while(rs.next()){
+                Vehicle vehicle = new Vehicle(rs.getInt("vlicense"));
+                vehicle.setVid(rs.getInt("vid"));
+                vehicle.setMake(rs.getString("make"));
+                vehicle.setModel(rs.getString("model"));
+                vehicle.setYear(rs.getInt("year"));
+                vehicle.setColor(rs.getString("color"));
+                vehicle.setOdometer(rs.getInt("odometer"));
+                vehicle.setStatus(rs.getString("status"));
+                vehicle.setVtname(rs.getString("vtname"));
+                vehicle.setLocation(rs.getString("location"));
+                vehicle.setCity(rs.getString("city"));
+                vehicleList.add(vehicle);
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return vehicleList;
+    }
 
 
     public void customQuery(String query, Connection con) throws SQLException{
