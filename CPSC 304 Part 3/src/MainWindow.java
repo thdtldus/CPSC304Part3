@@ -273,8 +273,6 @@ public class MainWindow extends Application {
         grid.add(vehicleName, 0, 0);
         Text colour = new Text("Colour: "+v.getColor());
         grid.add(colour, 0 ,1);
-        Text vehicleID = new Text("ID: "+v.getVid());
-        grid.add(vehicleID, 0, 2);
         Text vehicleLicense = new Text("License Plate: "+v.getVLicense());
         grid.add(vehicleLicense, 0, 3);
         Text vehicleType = new Text("Type of car: "+v.getVTName());

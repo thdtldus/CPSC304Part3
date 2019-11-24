@@ -3,7 +3,6 @@ package model;
 public class Vehicle {
 
     private final int vlicense;
-    private int vid;
     private String make;
     private String model;
     private int year;
@@ -21,10 +20,6 @@ public class Vehicle {
 
     public int getVLicense() {
         return vlicense;
-    }
-
-    public int getVid() {
-        return vid;
     }
 
     public String getMake() {
@@ -61,10 +56,6 @@ public class Vehicle {
 
     public String getCity() {
         return city;
-    }
-
-    public void setVid(int vid) {
-        this.vid = vid;
     }
 
     public void setMake(String make) {

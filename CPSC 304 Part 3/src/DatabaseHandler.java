@@ -29,7 +29,6 @@ public class DatabaseHandler {
             ResultSet rs = statement.executeQuery("SELECT * FROM Vehicle ORDER BY make");
             while(rs.next()){
                 Vehicle vehicle = new Vehicle(rs.getInt("vlicense"));
-                vehicle.setVid(rs.getInt("vid"));
                 vehicle.setMake(rs.getString("make"));
                 vehicle.setModel(rs.getString("model"));
                 vehicle.setYear(rs.getInt("year"));
@@ -116,7 +115,6 @@ public class DatabaseHandler {
             ResultSet rs = statement.executeQuery("SELECT * FROM Vehicle");
             while(rs.next()){
                 Vehicle vehicle = new Vehicle(rs.getInt("vlicense"));
-                vehicle.setVid(rs.getInt("vid"));
                 vehicle.setMake(rs.getString("make"));
                 vehicle.setModel(rs.getString("model"));
                 vehicle.setYear(rs.getInt("year"));
