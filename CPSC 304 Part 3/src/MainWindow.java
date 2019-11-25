@@ -32,6 +32,7 @@ public class MainWindow extends Application {
         Scene mainScene = initializeMainWindow();
         primaryStage.setScene(mainScene);
         primaryStage.show();
+        primaryStage.setTitle("SuperRent User Interface");
         Stage secondStage = new Stage();
         secondStage.setTitle("Login");
         secondStage.show();
@@ -146,10 +147,10 @@ public class MainWindow extends Application {
             @Override
             public void handle(ActionEvent event) {
                 try {
-                    Date fDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(fromDate.getText());
-                    Date tDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(toDate.getText());
-                    int confNum = dbhandler.createReservation(Integer.parseInt(licenseField.getText()), carTypeWantedField.getText(), con, fDate, tDate);
-                    createReservationWindow(confNum, carType.getText());
+                    Date fDate = new SimpleDateFormat("yyyy-MM-dd").parse(fromField.getText());
+                    Date tDate = new SimpleDateFormat("yyyy-MM-dd").parse(toField.getText());
+                    Reservation reservation = dbhandler.createReservation(Integer.parseInt(licenseField.getText()), carTypeWantedField.getText(), con, fDate, tDate);
+//                    createReservationWindow(confNum, carType.getText());
                 } catch (NumberFormatException ne){
                     createErrorWindow("You must pass in a proper license number!");
                 } catch (NoSuchCustomerException e){
@@ -157,7 +158,7 @@ public class MainWindow extends Application {
                 } catch (NoCarAvailableException e2){
                     createErrorWindow("There is no car available at that time!");
                 } catch (ParseException e) {
-                    e.printStackTrace();
+                    createErrorWindow("Need a proper date format!");
                 }
             }
         });
@@ -186,6 +187,7 @@ public class MainWindow extends Application {
                 //should also create error if reservation number doesn't exist
                 try {
                     Rent rental = dbhandler.createRental(Integer.parseInt(reserveField.getText()), con, cardName.getText(), cardNo.getText(), new SimpleDateFormat("yyyy-MM-dd").parse(expDate.getText()));
+                    createRentalWindow(rental);
                 } catch (ParseException e) {
                     createErrorWindow("Date was not correctly formatted!");
                 } catch (NullPointerException e2){
@@ -207,6 +209,10 @@ public class MainWindow extends Application {
         });
         Text generateReports = new Text("Generate reports for:");
         grid.add(generateReports, 0, 11);
+        Text branch = new Text("Branch: ");
+        grid.add(branch, 1, 11);
+        TextField branchField = new TextField();
+        grid.add(branchField, 2, 11);
         Button dailyRentals = new Button("Daily Rentals");
         grid.add(dailyRentals, 0, 12);
         dailyRentals.setOnAction(new EventHandler<ActionEvent>() {
@@ -220,11 +226,11 @@ public class MainWindow extends Application {
         dailyRentalsBranch.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                //daily rentals for branch window
+                createDailyRentalsBranchWindow(branchField.getText());
             }
         });
         Button dailyReturns = new Button("Daily Returns");
-        grid.add(dailyReturns, 2, 12);
+        grid.add(dailyReturns, 3, 12);
         dailyReturns.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -232,7 +238,7 @@ public class MainWindow extends Application {
             }
         });
         Button dailyReturnsBranch = new Button("Daily Returns for Branch");
-        grid.add(dailyReturnsBranch, 3, 12);
+        grid.add(dailyReturnsBranch, 4, 12);
         dailyReturnsBranch.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -256,13 +262,13 @@ public class MainWindow extends Application {
             public void handle(ActionEvent actionEvent) {
                try {
                    dbhandler.customQuery(query.getText(), con);
-                   //should create a window saying the query was successfully executed
+                   createSuccessWindow();
                } catch (SQLException e){
                    createErrorWindow("The query was not formed correctly!");
                }
             }
         });
-        Scene mainScene = new Scene (grid, 1000, 600);
+        Scene mainScene = new Scene (grid, 1100, 600);
         primaryStage.setScene(mainScene);
     }
 
@@ -366,6 +372,23 @@ public class MainWindow extends Application {
 
     }
 
+    private void createRentalWindow(Rent rental) {
+        Stage rentStage = new Stage();
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(20.0);
+        grid.setVgap(10.0);
+        Text cardName = new Text("Card Name: "+rental.getCardName());
+        grid.add(cardName, 0, 0);
+        Text cardNumber = new Text("Card Number: "+rental.getCardNo());
+        grid.add(cardNumber, 0, 1);
+        Text expiryDate = new Text("Expiry Date: "+rental.getExpDate().toString());
+        grid.add(expiryDate, 0, 2);
+        Scene scene = new Scene(grid, 500, 400);
+        rentStage.setScene(scene);
+        rentStage.show();
+    }
+
     private void createDailyRentalsWindow(){
         Stage stage = new Stage();
         GridPane grid = new GridPane();
@@ -387,6 +410,50 @@ public class MainWindow extends Application {
             acc++;
             Text location = new Text(v.getLocation()+", "+v.getCity());
             grid.add(location, 0, acc);
+            acc++;
+            Text separator = new Text("=========");
+            grid.add(separator, 0, acc);
+            acc++;
+            if (v.getVTName().equals("SUV")){
+                numSUV++;
+            } else if (v.getVTName().equals("truck")){
+                numTruck++;
+            }
+        }
+        Text numSUVText = new Text("Number of SUV rented: "+numSUV);
+        grid.add(numSUVText, 0, acc);
+        acc++;
+        Text numTruckText = new Text("Number of Truck rented: "+numTruck);
+        grid.add(numTruckText, 0, acc);
+        acc++;
+        Text totalNumber = new Text("Total number of rentals: "+vehicles.size());
+        grid.add(totalNumber, 0, acc);
+        Scene scene = new Scene(grid, 500, 500);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void createDailyRentalsBranchWindow(String location){
+        Stage stage = new Stage();
+        GridPane grid = new GridPane();
+        grid.setHgap(20.0);
+        grid.setVgap(10.0);
+        int acc = 0;
+        Text rentedVehicles = new Text("Vehicles rented today: ");
+        grid.add(rentedVehicles, 0, acc);
+        acc++;
+        int numSUV = 0;
+        int numTruck = 0;
+        ArrayList<Vehicle> vehicles = dbhandler.getDailyRentalsBranch(con, location);
+        for(Vehicle v : vehicles){
+            Text name = new Text(v.getMake()+" "+v.getModel()+" "+v.getYear());
+            grid.add(name, 0, acc);
+            acc++;
+            Text stats = new Text(v.getVTName()+", "+v.getColor()+", "+v.getOdometer()+" km travelled");
+            grid.add(stats, 0, acc);
+            acc++;
+            Text location2 = new Text(v.getLocation()+", "+v.getCity());
+            grid.add(location2, 0, acc);
             acc++;
             Text separator = new Text("=========");
             grid.add(separator, 0, acc);
@@ -518,12 +585,64 @@ public class MainWindow extends Application {
         Text rents = new Text("Rents: ");
         grid.add(rents, 0, acc);
         acc++;
+        for (Rent r : dbhandler.getAllRents(con)){
+            Text rid = new Text(Integer.toString(r.getRid()));
+            grid.add(rid, 0, acc);
+            Text vlicense = new Text(Integer.toString(r.getVlicense()));
+            grid.add(vlicense, 1, acc);
+            Text dlicense = new Text(Integer.toString(r.getDlicense()));
+            grid.add(dlicense, 2, acc);
+            Text fromDate = new Text(r.getFromDate().toString());
+            grid.add(fromDate, 3, acc);
+            Text toDate = new Text(r.getToDate().toString());
+            grid.add(toDate, 4, acc);
+            Text odometer = new Text(Integer.toString(r.getOdometer()));
+            grid.add(odometer, 5, acc);
+            Text cardName = new Text(r.getCardName());
+            grid.add(cardName, 6, acc);
+            Text cardNo = new Text(r.getCardNo());
+            grid.add(cardNo, 7, acc);
+            Text expDate = new Text(r.getExpDate().toString());
+            grid.add(expDate, 8, acc);
+            Text confNo = new Text(Integer.toString(r.getConfNo()));
+            grid.add(confNo, 9, acc);
+            acc++;
+        }
         Text returns = new Text("Returns: ");
         grid.add(returns, 0, acc);
+        acc++;
+        for (Return rt : dbhandler.getAllReturns(con)){
+            Text rid = new Text(Integer.toString(rt.getRid()));
+            grid.add(rid, 0, acc);
+            Text returnDate = new Text(rt.getReturnDate().toString());
+            grid.add(returnDate, 1, acc);
+            Text odometer = new Text(Integer.toString(rt.getOdometer()));
+            grid.add(odometer, 2, acc);
+            Text fulltank = new Text(rt.getFulltank());
+            grid.add(fulltank, 3, acc);
+            Text value = new Text(Double.toString(rt.getValue()));
+            grid.add(value, 4, acc);
+            acc++;
+        }
         Scene scene = new Scene(scroll, 1000, 1000);
         displayStage.setScene(scene);
         displayStage.show();
     }
+
+    private void createSuccessWindow(){
+        Stage successStage = new Stage();
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(20.0);
+        grid.setVgap(10.0);
+        Text success = new Text("Successfuly executed query!");
+        grid.add(success, 0, 0);
+        Scene scene = new Scene(grid, 250, 150);
+        successStage.setScene(scene);
+        successStage.show();
+    }
+
+
 
     private void createErrorWindow(String error){
         Stage errorStage = new Stage();
@@ -533,7 +652,7 @@ public class MainWindow extends Application {
         grid.setVgap(10.0);
         Text errorMessage = new Text("Error: "+error);
         grid.add(errorMessage, 0, 0);
-        Scene scene = new Scene(grid, 500, 500);
+        Scene scene = new Scene(grid, 500, 250);
         errorStage.setScene(scene);
         errorStage.show();
     }

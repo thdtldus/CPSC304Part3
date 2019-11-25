@@ -18,7 +18,7 @@ public class Reservation {
     }
 
     public void setConfNo(){
-        confNo = (int)(Math.random()*1000);
+        this.confNo = (int)(Math.random()*10000);
     }
 
     public void setExistingConf(int confNo){
